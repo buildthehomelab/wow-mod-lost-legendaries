@@ -1,0 +1,58 @@
+[worldserver]
+
+########################################
+# mod-lost-legendaries
+#
+# Legendary items that exist in the game data but never drop, back in the game.
+########################################
+
+#
+#    LostLegendaries.Enable
+#        Description: Master switch. With 0 the lost legendaries never drop, even though their
+#                     loot rows stay in the world database, and the Ashbringer quests can't be
+#                     completed. An objective that was finished while this was 0 only counts
+#                     once it updates again after switching back to 1.
+#        Default:     1
+#
+
+LostLegendaries.Enable = 1
+
+#
+#    LostLegendaries.TalismanOfBinding.Chance
+#        Description: Drop chance (percent) of the Talisman of Binding Shard from Baron Geddon and
+#                     of the Talisman of Binding Fragment from Garr, per kill. The default matches
+#                     the Bindings of the Windseeker on the same two bosses. Like the Bindings, the
+#                     roll is still multiplied by Rate.Drop.Item.Legendary (100 always drops).
+#                     0 stops both dropping.
+#        Default:     3
+#
+
+LostLegendaries.TalismanOfBinding.Chance = 3
+
+#
+#    LostLegendaries.ShardOfTheDefiler.Chance
+#        Description: Drop chance (percent) of the Shard of the Defiler from Lord Kazzak, per kill.
+#                     Still multiplied by Rate.Drop.Item.Legendary. 0 stops it dropping.
+#        Default:     3
+#
+
+LostLegendaries.ShardOfTheDefiler.Chance = 3
+
+#
+#    LostLegendaries.GlaiveOfTheDefender.Chance
+#        Description: Drop chance (percent) of the Glaive of the Defender from Sapphiron in
+#                     mod-individual-progression's level 60 Naxxramas, per kill. Still multiplied
+#                     by Rate.Drop.Item.Legendary. 0 stops it dropping.
+#        Default:     3
+#
+
+LostLegendaries.GlaiveOfTheDefender.Chance = 3
+
+#
+#    LostLegendaries.Ashbringer.Announce
+#        Description: Announce to the whole server when a player finishes the Ashbringer quest
+#                     chain.
+#        Default:     1
+#
+
+LostLegendaries.Ashbringer.Announce = 1
