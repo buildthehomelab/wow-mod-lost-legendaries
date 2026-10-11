@@ -3,18 +3,27 @@
 -- module's db-world folder. Remove the module first: while it is still built in, its startup
 -- check puts the loot rows back.
 --
--- Removes the four loot rows, the Ashbringer quest chain and its summoned boss, turns the Glaive
--- of the Defender back into the ranged-slot bow that stock AzerothCore has, and marks the two
--- Talismans of Binding deprecated again. Items that players already own are left alone, and so are
+-- Removes the five loot rows, the Ashbringer quest chain and its summoned boss, turns the Glaive
+-- of the Defender back into the ranged-slot bow that stock AzerothCore has, marks the two
+-- Talismans of Binding deprecated again, and makes Foror's Fabled Steed teach its spell again. Items that players already own are left alone, and so are
 -- their finished quests. It also forgets that the module's updates were applied, so installing
 -- the module again applies them again. Idempotent: safe to run again.
 
--- Talisman of Binding Shard / Fragment, Shard of the Defiler, Glaive of the Defender
+-- Talisman of Binding Shard / Fragment, Shard of the Defiler, Glaive of the Defender, Foror's
+-- Fabled Steed
 DELETE FROM `creature_loot_template`
 WHERE (`Entry` = 12056 AND `Item` = 17782)
    OR (`Entry` = 12057 AND `Item` = 17783)
    OR (`Entry` = 12397 AND `Item` = 17142)
-   OR (`Entry` = 351018 AND `Item` = 23051);
+   OR (`Entry` = 351018 AND `Item` = 23051)
+   OR (`Entry` = 11583 AND `Item` = 20221);
+
+-- Foror's Fabled Steed: the stock item, which teaches Chromatic Mount and is consumed
+UPDATE `item_template` SET
+    `description` = 'Teaches you how to summon this mount.  This is a very fast mount.',
+    `spellid_1` = 55884, `spelltrigger_1` = 0, `spellcharges_1` = -1,
+    `spellid_2` = 24576, `spelltrigger_2` = 6
+WHERE `entry` = 20221;
 
 -- Talisman of Binding Shard / Fragment: the deprecated flag again
 UPDATE `item_template` SET `Flags` = `Flags` | 16 WHERE `entry` IN (17782, 17783);
