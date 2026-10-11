@@ -63,10 +63,25 @@ the Glaive still gets its fix, but nothing drops it.
 
 A legendary mount that was never obtainable: a **chromatic drake**, red and teal with orange
 wings, the same look as Gyth in Upper Blackrock Spire. It drops from **Nefarian**, who bred the
-chromatic dragonflight. Despite the wings it is a very fast ground mount (100% speed, with slow
-fall); it does not fly. It needs riding skill 150.
+chromatic dragonflight. It needs riding skill 150.
 
-Two things are changed to make it work:
+In Azeroth it is a very fast ground mount (100% speed, with slow fall). Where flying mounts work
+it flies, once you have the riding skill for it:
+
+| Riding skill | Where | Speed |
+| --- | --- | --- |
+| 150 | anywhere | 100% on the ground |
+| 225 (Expert) | Outland, and Northrend with Cold Weather Flying | 150% flying |
+| 300 (Artisan) | Outland, and Northrend with Cold Weather Flying | 280% flying |
+
+The same rules as any flying mount decide where: if a Swift Blue Gryphon would fly there, so does
+the steed. Ride out of a flying area and it becomes a ground mount again, and its slow fall
+softens the landing. On a realm that is still in vanilla nothing changes, since there is no
+flying skill to learn yet. `LostLegendaries.FororsFabledSteed.Flying = 0` keeps it on the ground
+everywhere. If you run a module that rescales mount speeds, such as mod-mount-scaling, it
+rescales the steed's flight the same way as other flying mounts'.
+
+Three things are changed to make it work:
 
 - **The look.** The 3.3.5a spell data puts you on a bronze drake, the one that flies you into the
   Caverns of Time. The module points the mount spell back at the chromatic drake it was made for.
@@ -75,6 +90,10 @@ Two things are changed to make it work:
   shows a mount in the Mounts tab when its own data lists the spell, and it doesn't list this
   one. So the item works the way mounts did in vanilla: you keep it in your bags and use it to
   mount. Its tooltip is the spell's own, including the developers' "You wish!".
+- **Flight.** The mount spell itself has no flight in it. While you are mounted the module adds
+  a hidden, server-only effect that carries the flight speed, the same kind every flying mount
+  has. The client doesn't know that effect, so it shows no extra buff; the mount's own buff is
+  the one you see and cancel.
 
 Players who already have the item cached need to clear their client's `Cache` folder.
 
@@ -139,7 +158,8 @@ Category: Dungeons
 - **Sapphiron** now has a small chance to drop the **Glaive of the Defender**, a legendary sword
   for warriors. The Glaive is a Main Hand sword again instead of a bow.
 - **Nefarian** now has a very small chance to drop **Foror's Fabled Steed**, a chromatic drake
-  you ride on the ground. Keep it in your bags and use it to mount.
+  mount. Keep it in your bags and use it to ride. It runs on the ground in Azeroth and flies
+  wherever flying mounts can, once you have the riding skill.
 - **Tirion Fordring** now recognizes the **Corrupted Ashbringer**. Bring it to him in the Eastern
   Plaguelands to begin a quest chain that ends with the **Ashbringer** itself.
 - The chain's last trial is a new boss, the **Shade of Highlord Mograine**, which must be defeated
@@ -186,6 +206,7 @@ mod-lost-legendaries: enabled, drop chances: Talisman of Binding 3%, Shard of th
 | `LostLegendaries.ShardOfTheDefiler.Chance` | `3` | Drop chance in percent for the Shard of the Defiler. `0` stops it dropping. |
 | `LostLegendaries.GlaiveOfTheDefender.Chance` | `3` | Drop chance in percent for the Glaive of the Defender. `0` stops it dropping. |
 | `LostLegendaries.FororsFabledSteed.Chance` | `1` | Drop chance in percent for Foror's Fabled Steed. `0` stops it dropping. |
+| `LostLegendaries.FororsFabledSteed.Flying` | `1` | Let the steed fly where flying mounts work, for riders with riding skill 225 or more. `0` keeps it a ground mount. |
 | `LostLegendaries.Ashbringer.Announce` | `1` | Announce to the whole server when a player finishes the Ashbringer chain. |
 
 The core multiplies each chance by `Rate.Drop.Item.Legendary`, as it does for the Bindings of
@@ -203,6 +224,8 @@ the Windseeker. A chance of `100` always drops, whatever the rate.
 - Foror's Fabled Steed's two spell slots and description in `item_template`, so the item mounts
   you instead of teaching the spell. The chromatic look is set in memory when the server loads
   its spells and is not in the database.
+- Two server-only spells in `spell_dbc` (90230 and 90231, the steed's flight speeds) and one
+  `spell_script_names` row on the mount spell. Spell ids 90230-90239 are this module's range.
 - The Glaive of the Defender's type, slot, material and sheath in `item_template`, plus an
   `item_dbc` row with the same values. The core takes those fields from Item.dbc, so without the
   `item_dbc` row it would undo the change at startup.
@@ -234,6 +257,9 @@ and fourth steps can no longer be finished. Items that players already own are l
   come from the server and are correct.
 - **Foror's Fabled Steed is a bronze drake, or teaches a spell and vanishes:** the module isn't
   loaded (bronze drake), or the client still has the old item cached (clear the `Cache` folder).
+- **Foror's Fabled Steed doesn't fly:** it only flies where flying mounts do, with riding skill
+  225 or more, and `LostLegendaries.FororsFabledSteed.Flying` must be `1`. If you rode into the
+  flying area already mounted and it stays grounded, dismount and mount again.
 - **Tirion doesn't offer the first quest:** you need to be level 60 and have a Corrupted
   Ashbringer on you, and the server needs mod-individual-progression's Naxxramas 40.
 - **No credit from Fairbanks:** he only talks during the Corrupted Ashbringer event, which needs

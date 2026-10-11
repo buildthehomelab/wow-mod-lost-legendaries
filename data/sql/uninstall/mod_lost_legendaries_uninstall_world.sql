@@ -47,5 +47,9 @@ DELETE FROM `creature_equip_template` WHERE `CreatureID` = 9501300;
 DELETE FROM `creature_template_model` WHERE `CreatureID` = 9501300;
 DELETE FROM `creature_template` WHERE `entry` = 9501300;
 
+-- Foror's Fabled Steed: flight auras and the mount spell's script
+DELETE FROM `spell_script_names` WHERE `spell_id` = 24576 AND `ScriptName` = 'spell_lost_legendaries_chromatic_mount';
+DELETE FROM `spell_dbc` WHERE `ID` IN (90230, 90231);
+
 -- Let a later reinstall apply the module's updates again
 DELETE FROM `updates` WHERE `name` LIKE 'mod\_lost\_legendaries\_%';

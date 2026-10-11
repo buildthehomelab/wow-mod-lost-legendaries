@@ -13,6 +13,7 @@ namespace LostLegendaries
     {
         bool enabled = true;
         bool announceAshbringer = true;
+        bool steedFlying = true;
     };
 
     extern Config config;

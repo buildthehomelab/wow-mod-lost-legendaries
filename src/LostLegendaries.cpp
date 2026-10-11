@@ -24,7 +24,7 @@
  * 15135 "Chromatic Drake Mount", but the 3.3.5a spell data points it at 18768 "Brazen Taxi", the
  * bronze drake from the Caverns of Time. The mount's look comes from that creature on the server
  * side, so pointing the spell back at 15135 here is enough to make it a chromatic drake again; no
- * client patch is involved.
+ * client patch is involved. LostLegendariesSteed.cpp lets it fly where flying is allowed.
  *
  * The Ashbringer quest chain is in LostLegendariesAshbringer.cpp.
  *
@@ -109,6 +109,7 @@ public:
     {
         LostLegendaries::config.enabled = sConfigMgr->GetOption<bool>("LostLegendaries.Enable", true);
         LostLegendaries::config.announceAshbringer = sConfigMgr->GetOption<bool>("LostLegendaries.Ashbringer.Announce", true);
+        LostLegendaries::config.steedFlying = sConfigMgr->GetOption<bool>("LostLegendaries.FororsFabledSteed.Flying", true);
         for (LostDrop& drop : drops)
             drop.chance = std::clamp(sConfigMgr->GetOption<float>(drop.chanceOption, drop.defaultChance), 0.0f, 100.0f);
 

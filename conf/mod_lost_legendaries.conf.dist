@@ -59,6 +59,17 @@ LostLegendaries.GlaiveOfTheDefender.Chance = 3
 LostLegendaries.FororsFabledSteed.Chance = 1
 
 #
+#    LostLegendaries.FororsFabledSteed.Flying
+#        Description: Let Foror's Fabled Steed fly where flying mounts work (Outland, and Northrend
+#                     with Cold Weather Flying) for riders with riding skill 225 or more: +150%
+#                     flight speed at 225, +280% at 300. Everywhere else, and with 0, it is a
+#                     ground mount.
+#        Default:     1
+#
+
+LostLegendaries.FororsFabledSteed.Flying = 1
+
+#
 #    LostLegendaries.Ashbringer.Announce
 #        Description: Announce to the whole server when a player finishes the Ashbringer quest
 #                     chain.

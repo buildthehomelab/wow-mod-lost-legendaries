@@ -10,9 +10,11 @@
 
 void AddLostLegendariesScripts();
 void AddLostLegendariesAshbringerScripts();
+void AddLostLegendariesSteedScripts();
 
 void Addmod_lost_legendariesScripts()
 {
     AddLostLegendariesScripts();
     AddLostLegendariesAshbringerScripts();
+    AddLostLegendariesSteedScripts();
 }
