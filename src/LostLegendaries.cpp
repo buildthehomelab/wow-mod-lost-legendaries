@@ -8,16 +8,23 @@
  *   Talisman of Binding Fragment (17783)  Garr
  *   Shard of the Defiler (17142)          Lord Kazzak
  *   Glaive of the Defender (23051)        Sapphiron (mod-individual-progression's Naxxramas 40)
+ *   Foror's Fabled Steed (20221)          Nefarian
  * The loot rows only say where the items drop. The chance is set here, on every roll of one of
  * these items, from the item's Chance setting, and with the module switched off the roll always
  * fails. So the config works without touching the database again. The core still applies
  * Rate.Drop.Item.Legendary on top, as it does for the Bindings of the Windseeker (a chance of
  * 100 always drops, whatever the rate).
  *
- * The four rows are also checked at every startup and put back if one is missing. Two things
+ * The rows are also checked at every startup and put back if one is missing. Two things
  * make that necessary: the module's SQL can run before the level 60 Sapphiron exists (on a new
  * database it sorts ahead of mod-individual-progression's), and mod-individual-progression
  * deletes and rebuilds its Naxxramas 40 loot whenever its own SQL file changes.
+ *
+ * Foror's Fabled Steed is a mount. Its spell, Chromatic Mount (24576), was built for creature
+ * 15135 "Chromatic Drake Mount", but the 3.3.5a spell data points it at 18768 "Brazen Taxi", the
+ * bronze drake from the Caverns of Time. The mount's look comes from that creature on the server
+ * side, so pointing the spell back at 15135 here is enough to make it a chromatic drake again; no
+ * client patch is involved.
  *
  * The Ashbringer quest chain is in LostLegendariesAshbringer.cpp.
  *
@@ -31,29 +38,36 @@
 #include "Log.h"
 #include "LootMgr.h"
 #include "ScriptMgr.h"
+#include "SpellInfo.h"
 
 #include <algorithm>
 #include <array>
+#include <string>
 
 LostLegendaries::Config LostLegendaries::config;
 
 namespace
 {
+    constexpr uint32 SPELL_CHROMATIC_MOUNT = 24576;
+    constexpr uint32 NPC_CHROMATIC_DRAKE_MOUNT = 15135;
+
     struct LostDrop
     {
         uint32 itemId;
         uint32 lootId;        // creature_loot_template entry of the boss
-        char const* comment;  // the loot row's Comment, as in the module's SQL (no quotes in it)
+        char const* comment;  // the loot row's Comment, as in the module's SQL
         char const* chanceOption;
-        float chance;         // percent, 0 = never
+        float defaultChance;  // percent; also the Chance written in the loot row
+        float chance;         // percent from the config, 0 = never
     };
 
-    std::array<LostDrop, 4> drops =
+    std::array<LostDrop, 5> drops =
     {{
-        { 17782, 12056,  "Baron Geddon - Talisman of Binding Shard",          "LostLegendaries.TalismanOfBinding.Chance",   3.0f },
-        { 17783, 12057,  "Garr - Talisman of Binding Fragment",               "LostLegendaries.TalismanOfBinding.Chance",   3.0f },
-        { 17142, 12397,  "Lord Kazzak - Shard of the Defiler",                "LostLegendaries.ShardOfTheDefiler.Chance",   3.0f },
-        { 23051, 351018, "Sapphiron (Naxxramas 40) - Glaive of the Defender", "LostLegendaries.GlaiveOfTheDefender.Chance", 3.0f },
+        { 17782, 12056,  "Baron Geddon - Talisman of Binding Shard",          "LostLegendaries.TalismanOfBinding.Chance",   3.0f, 3.0f },
+        { 17783, 12057,  "Garr - Talisman of Binding Fragment",               "LostLegendaries.TalismanOfBinding.Chance",   3.0f, 3.0f },
+        { 17142, 12397,  "Lord Kazzak - Shard of the Defiler",                "LostLegendaries.ShardOfTheDefiler.Chance",   3.0f, 3.0f },
+        { 23051, 351018, "Sapphiron (Naxxramas 40) - Glaive of the Defender", "LostLegendaries.GlaiveOfTheDefender.Chance", 3.0f, 3.0f },
+        { 20221, 11583,  "Nefarian - Foror's Fabled Steed",                   "LostLegendaries.FororsFabledSteed.Chance",   1.0f, 1.0f },
     }};
 }
 
@@ -82,8 +96,10 @@ public:
                 continue;
             }
 
+            std::string comment = drop.comment;
+            WorldDatabase.EscapeString(comment);
             WorldDatabase.DirectExecute("INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) "
-                "VALUES ({}, {}, 0, 3, 0, 1, 0, 1, 1, '{}')", drop.lootId, drop.itemId, drop.comment);
+                "VALUES ({}, {}, 0, {}, 0, 1, 0, 1, 1, '{}')", drop.lootId, drop.itemId, drop.defaultChance, comment);
             LOG_WARN("server.loading", "mod-lost-legendaries: the loot row for item {} was missing and has been added again ({})",
                 drop.itemId, drop.comment);
         }
@@ -94,17 +110,26 @@ public:
         LostLegendaries::config.enabled = sConfigMgr->GetOption<bool>("LostLegendaries.Enable", true);
         LostLegendaries::config.announceAshbringer = sConfigMgr->GetOption<bool>("LostLegendaries.Ashbringer.Announce", true);
         for (LostDrop& drop : drops)
-            drop.chance = std::clamp(sConfigMgr->GetOption<float>(drop.chanceOption, 3.0f), 0.0f, 100.0f);
+            drop.chance = std::clamp(sConfigMgr->GetOption<float>(drop.chanceOption, drop.defaultChance), 0.0f, 100.0f);
 
-        LOG_INFO("server.loading", "mod-lost-legendaries: {}, drop chances: Talisman of Binding {}%, Shard of the Defiler {}%, Glaive of the Defender {}%",
-            LostLegendaries::config.enabled ? "enabled" : "disabled", drops[0].chance, drops[2].chance, drops[3].chance);
+        LOG_INFO("server.loading", "mod-lost-legendaries: {}, drop chances: Talisman of Binding {}%, Shard of the Defiler {}%, Glaive of the Defender {}%, Foror's Fabled Steed {}%",
+            LostLegendaries::config.enabled ? "enabled" : "disabled", drops[0].chance, drops[2].chance, drops[3].chance, drops[4].chance);
     }
 };
 
 class LostLegendariesGlobalScript : public GlobalScript
 {
 public:
-    LostLegendariesGlobalScript() : GlobalScript("LostLegendariesGlobalScript", { GLOBALHOOK_ON_ITEM_ROLL }) { }
+    LostLegendariesGlobalScript() : GlobalScript("LostLegendariesGlobalScript",
+        { GLOBALHOOK_ON_ITEM_ROLL, GLOBALHOOK_ON_LOAD_SPELL_CUSTOM_ATTR }) { }
+
+    // Runs once per spell while the core loads spell data. Not tied to Enable: the spell is only
+    // reachable through the item, and a config reload could not undo it anyway.
+    void OnLoadSpellCustomAttr(SpellInfo* spell) override
+    {
+        if (spell->Id == SPELL_CHROMATIC_MOUNT)
+            spell->Effects[EFFECT_0].MiscValue = NPC_CHROMATIC_DRAKE_MOUNT;
+    }
 
     // Runs for every loot row the server rolls, so it has to stay this cheap. Returning false
     // fails the roll.

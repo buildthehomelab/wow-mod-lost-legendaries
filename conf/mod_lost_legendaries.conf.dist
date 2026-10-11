@@ -49,6 +49,16 @@ LostLegendaries.ShardOfTheDefiler.Chance = 3
 LostLegendaries.GlaiveOfTheDefender.Chance = 3
 
 #
+#    LostLegendaries.FororsFabledSteed.Chance
+#        Description: Drop chance (percent) of Foror's Fabled Steed, the chromatic drake mount,
+#                     from Nefarian, per kill. The default matches the Deathcharger's Reins. Still
+#                     multiplied by Rate.Drop.Item.Legendary. 0 stops it dropping.
+#        Default:     1
+#
+
+LostLegendaries.FororsFabledSteed.Chance = 1
+
+#
 #    LostLegendaries.Ashbringer.Announce
 #        Description: Announce to the whole server when a player finishes the Ashbringer quest
 #                     chain.

@@ -9,10 +9,12 @@ items back in the game: items that are still in the game data but that nothing g
 | Talisman of Binding Fragment | Garr, 3% |
 | Shard of the Defiler | Lord Kazzak, 3% |
 | Glaive of the Defender | Sapphiron (level 60 Naxxramas), 3% |
+| Foror's Fabled Steed (mount) | Nefarian, 1% |
 | Ashbringer | A quest chain from Tirion Fordring that starts with the Corrupted Ashbringer |
 
-The 3% is the chance of the **Bindings of the Windseeker**, and each drop has its own setting.
-Every drop is its own roll, so it never takes the place of anything else the boss drops.
+The 3% is the chance of the **Bindings of the Windseeker**, the mount's 1% is the
+**Deathcharger's Reins**', and each drop has its own setting. Every drop is its own roll, so it
+never takes the place of anything else the boss drops.
 
 ## Talisman of Binding
 
@@ -56,6 +58,25 @@ it. As a bow the effect could never trigger, so this is new behavior that comes 
 
 The level 60 Sapphiron comes from mod-individual-progression's Naxxramas 40. Without that module
 the Glaive still gets its fix, but nothing drops it.
+
+## Foror's Fabled Steed
+
+A legendary mount that was never obtainable: a **chromatic drake**, red and teal with orange
+wings, the same look as Gyth in Upper Blackrock Spire. It drops from **Nefarian**, who bred the
+chromatic dragonflight. Despite the wings it is a very fast ground mount (100% speed, with slow
+fall); it does not fly. It needs riding skill 150.
+
+Two things are changed to make it work:
+
+- **The look.** The 3.3.5a spell data puts you on a bronze drake, the one that flies you into the
+  Caverns of Time. The module points the mount spell back at the chromatic drake it was made for.
+  That happens on the server; no client patch is needed.
+- **The item.** In 3.3.5a the item teaches the mount spell and disappears, but the client only
+  shows a mount in the Mounts tab when its own data lists the spell, and it doesn't list this
+  one. So the item works the way mounts did in vanilla: you keep it in your bags and use it to
+  mount. Its tooltip is the spell's own, including the developers' "You wish!".
+
+Players who already have the item cached need to clear their client's `Cache` folder.
 
 ## Ashbringer
 
@@ -117,6 +138,8 @@ Category: Dungeons
 - **Lord Kazzak** now has a small chance to drop the **Shard of the Defiler**, a legendary dagger.
 - **Sapphiron** now has a small chance to drop the **Glaive of the Defender**, a legendary sword
   for warriors. The Glaive is a Main Hand sword again instead of a bow.
+- **Nefarian** now has a very small chance to drop **Foror's Fabled Steed**, a chromatic drake
+  you ride on the ground. Keep it in your bags and use it to mount.
 - **Tirion Fordring** now recognizes the **Corrupted Ashbringer**. Bring it to him in the Eastern
   Plaguelands to begin a quest chain that ends with the **Ashbringer** itself.
 - The chain's last trial is a new boss, the **Shade of Highlord Mograine**, which must be defeated
@@ -151,7 +174,7 @@ automatically on the next worldserver start.
 To check that it's loaded, look for this line in the worldserver log at startup:
 
 ```
-mod-lost-legendaries: enabled, drop chances: Talisman of Binding 3%, Shard of the Defiler 3%, Glaive of the Defender 3%
+mod-lost-legendaries: enabled, drop chances: Talisman of Binding 3%, Shard of the Defiler 3%, Glaive of the Defender 3%, Foror's Fabled Steed 1%
 ```
 
 ## Configuration
@@ -162,6 +185,7 @@ mod-lost-legendaries: enabled, drop chances: Talisman of Binding 3%, Shard of th
 | `LostLegendaries.TalismanOfBinding.Chance` | `3` | Drop chance in percent for each Talisman of Binding, per kill. `0` stops both dropping. |
 | `LostLegendaries.ShardOfTheDefiler.Chance` | `3` | Drop chance in percent for the Shard of the Defiler. `0` stops it dropping. |
 | `LostLegendaries.GlaiveOfTheDefender.Chance` | `3` | Drop chance in percent for the Glaive of the Defender. `0` stops it dropping. |
+| `LostLegendaries.FororsFabledSteed.Chance` | `1` | Drop chance in percent for Foror's Fabled Steed. `0` stops it dropping. |
 | `LostLegendaries.Ashbringer.Announce` | `1` | Announce to the whole server when a player finishes the Ashbringer chain. |
 
 The core multiplies each chance by `Rate.Drop.Item.Legendary`, as it does for the Bindings of
@@ -169,13 +193,16 @@ the Windseeker. A chance of `100` always drops, whatever the rate.
 
 ## What it changes in the database
 
-- Four rows in `creature_loot_template` (Baron Geddon, Garr, Lord Kazzak, and the level 60
-  Sapphiron if it exists). The chance isn't read from those rows: the module sets it on every
+- Five rows in `creature_loot_template` (Baron Geddon, Garr, Lord Kazzak, Nefarian, and the level
+  60 Sapphiron if it exists). The chance isn't read from those rows: the module sets it on every
   roll from the config, and makes the roll fail when the module is switched off. The module also
-  checks the four rows at every startup and adds back any that are missing, because another
+  checks the rows at every startup and adds back any that are missing, because another
   module's SQL can remove them (mod-individual-progression rebuilds its Naxxramas loot whenever
   its own SQL changes). It logs a warning when it does.
 - The "deprecated" flag is cleared on the two Talismans of Binding in `item_template`.
+- Foror's Fabled Steed's two spell slots and description in `item_template`, so the item mounts
+  you instead of teaching the spell. The chromatic look is set in memory when the server loads
+  its spells and is not in the database.
 - The Glaive of the Defender's type, slot, material and sheath in `item_template`, plus an
   `item_dbc` row with the same values. The core takes those fields from Item.dbc, so without the
   `item_dbc` row it would undo the change at startup.
@@ -205,6 +232,8 @@ and fourth steps can no longer be finished. Items that players already own are l
 - **The Glaive of the Defender sits oddly on the character:** the client's own Item.dbc still
   lists it as a bow, and the client uses that file to place the model. The tooltip and the slot
   come from the server and are correct.
+- **Foror's Fabled Steed is a bronze drake, or teaches a spell and vanishes:** the module isn't
+  loaded (bronze drake), or the client still has the old item cached (clear the `Cache` folder).
 - **Tirion doesn't offer the first quest:** you need to be level 60 and have a Corrupted
   Ashbringer on you, and the server needs mod-individual-progression's Naxxramas 40.
 - **No credit from Fairbanks:** he only talks during the Corrupted Ashbringer event, which needs
