@@ -224,16 +224,18 @@ the Windseeker. A chance of `100` always drops, whatever the rate.
 - Foror's Fabled Steed's two spell slots and description in `item_template`, so the item mounts
   you instead of teaching the spell. The chromatic look is set in memory when the server loads
   its spells and is not in the database.
-- Two server-only spells in `spell_dbc` (90230 and 90231, the steed's flight speeds) and one
-  `spell_script_names` row on the mount spell. Spell ids 90230-90239 are this module's range.
+- Two server-only spells in `spell_dbc` (90350 and 90351, the steed's flight speeds) and one
+  `spell_script_names` row on the mount spell.
 - The Glaive of the Defender's type, slot, material and sheath in `item_template`, plus an
   `item_dbc` row with the same values. The core takes those fields from Item.dbc, so without the
   `item_dbc` row it would undo the change at startup.
 - Quests 9501300-9501304 with their texts, Tirion Fordring as their giver and ender, and one
   `conditions` row for the first quest.
-- Creature 9501300, the Shade of Highlord Mograine, with its model, weapon and lines. It has no
+- Creature 9503000, the Shade of Highlord Mograine, with its model, weapon and lines. It has no
   spawn: the module's script summons it.
-- Ids 9501300-9501399 are this module's range.
+- This module's id ranges: quests 9501300-9501399, creatures 9503000-9503099, spells
+  90350-90359. Until 2026-10-11 the shade was creature 9501300 and the two spells were 90230 and
+  90231; the module's SQL removes those rows when it finds them.
 
 ## Uninstalling
 

@@ -17,7 +17,7 @@
 -- The two kill quests are typed Raid (62) because the core gives no quest credit in a raid group
 -- otherwise; the rest are typed Legendary (83).
 --
--- The Shade of Highlord Mograine (creature 9501300) is summoned by the module's script when a
+-- The Shade of Highlord Mograine (creature 9503000) is summoned by the module's script when a
 -- player on the fourth quest tells Tirion to begin. It is tuned like Prince Thunderaan, the
 -- Thunderfury chain's summoned boss: level 63, boss rank, about 400,000 health. It uses Highlord
 -- Mograine's model (16139) and weapon (22709), and the crowd-control immunity set that stock
@@ -26,35 +26,46 @@
 -- an open-world world boss evades as soon as it is 30 yards from where it appeared, even in the
 -- middle of a fight. Without the flag it can be moved for as long as it is being damaged.
 --
--- Ids 9501300-9501399 are this module's range (quests and creatures). No stock rows are changed.
+-- This module's ids: quests 9501300-9501399, creatures 9503000-9503099. No stock rows are changed.
 -- Idempotent. Undo with data/sql/uninstall/mod_lost_legendaries_uninstall_world.sql.
 
 -- ---------------------------------------------------------------------------------------------
 -- Shade of Highlord Mograine
 -- ---------------------------------------------------------------------------------------------
 
-DELETE FROM `creature_template` WHERE `entry` = 9501300;
+-- Until 2026-10-11 the shade was creature 9501300. That id is inside 9501000-9501499, the block the
+-- druid form look pack numbers its preview creatures from, so the shade moved to 9503000. Remove
+-- the old rows, but only while 9501300 is still the shade: by now it may be someone else's.
+DELETE x FROM `creature_text` x JOIN `creature_template` t ON t.`entry` = x.`CreatureID`
+WHERE t.`entry` = 9501300 AND t.`ScriptName` = 'boss_lost_legendaries_mograine_shade';
+DELETE x FROM `creature_equip_template` x JOIN `creature_template` t ON t.`entry` = x.`CreatureID`
+WHERE t.`entry` = 9501300 AND t.`ScriptName` = 'boss_lost_legendaries_mograine_shade';
+DELETE x FROM `creature_template_model` x JOIN `creature_template` t ON t.`entry` = x.`CreatureID`
+WHERE t.`entry` = 9501300 AND t.`ScriptName` = 'boss_lost_legendaries_mograine_shade';
+DELETE FROM `creature_template` WHERE `entry` = 9501300 AND `ScriptName` = 'boss_lost_legendaries_mograine_shade';
+
+DELETE FROM `creature_template` WHERE `entry` = 9503000;
 INSERT INTO `creature_template` (`entry`, `name`, `subname`, `minlevel`, `maxlevel`, `exp`, `faction`, `speed_walk`, `speed_run`, `detection_range`, `rank`, `DamageModifier`, `BaseAttackTime`, `RangeAttackTime`, `BaseVariance`, `RangeVariance`, `unit_class`, `unit_flags2`, `type`, `type_flags`, `AIName`, `MovementType`, `HoverHeight`, `HealthModifier`, `ManaModifier`, `ArmorModifier`, `ExperienceModifier`, `RegenHealth`, `CreatureImmunitiesId`, `flags_extra`, `ScriptName`) VALUES
-(9501300, 'Shade of Highlord Mograine', 'The Ashbringer', 63, 63, 0, 21, 1, 1.71429, 20, 3, 13, 2000, 2000, 1, 1, 1, 2048, 6, 0, '', 0, 1, 120, 1, 1.3, 0, 1, -406, 0, 'boss_lost_legendaries_mograine_shade');
+(9503000, 'Shade of Highlord Mograine', 'The Ashbringer', 63, 63, 0, 21, 1, 1.71429, 20, 3, 13, 2000, 2000, 1, 1, 1, 2048, 6, 0, '', 0, 1, 120, 1, 1.3, 0, 1, -406, 0, 'boss_lost_legendaries_mograine_shade');
 
-DELETE FROM `creature_template_model` WHERE `CreatureID` = 9501300;
+DELETE FROM `creature_template_model` WHERE `CreatureID` = 9503000;
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
-(9501300, 0, 16139, 1, 1, 0);
+(9503000, 0, 16139, 1, 1, 0);
 
-DELETE FROM `creature_equip_template` WHERE `CreatureID` = 9501300;
+DELETE FROM `creature_equip_template` WHERE `CreatureID` = 9503000;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
-(9501300, 1, 22709, 0, 0, 0);
+(9503000, 1, 22709, 0, 0, 0);
 
 -- The lines are the Corrupted Ashbringer's own whispers, with their stock sounds.
-DELETE FROM `creature_text` WHERE `CreatureID` = 9501300;
+DELETE FROM `creature_text` WHERE `CreatureID` = 9503000;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(9501300, 0, 0, 'I was once called Ashbringer.', 14, 0, 100, 0, 0, 8908, 0, 0, 'Shade of Highlord Mograine - summoned'),
-(9501300, 1, 0, 'Betrayed by my order.', 14, 0, 100, 0, 0, 8920, 0, 0, 'Shade of Highlord Mograine - memory'),
-(9501300, 1, 1, 'Destroyed by Kel''Thuzad.', 14, 0, 100, 0, 0, 8921, 0, 0, 'Shade of Highlord Mograine - memory'),
-(9501300, 1, 2, 'Made to serve.', 14, 0, 100, 0, 0, 8922, 0, 0, 'Shade of Highlord Mograine - memory'),
-(9501300, 1, 3, 'My son watched me die.', 14, 0, 100, 0, 0, 8923, 0, 0, 'Shade of Highlord Mograine - memory'),
-(9501300, 2, 0, 'Kill them all!', 14, 0, 100, 0, 0, 8928, 0, 0, 'Shade of Highlord Mograine - frenzy at 30%'),
-(9501300, 3, 0, 'I was pure once...', 14, 0, 100, 0, 0, 8906, 0, 0, 'Shade of Highlord Mograine - death');
+(9503000, 0, 0, 'I was once called Ashbringer.', 14, 0, 100, 0, 0, 8908, 0, 0, 'Shade of Highlord Mograine - summoned'),
+(9503000, 1, 0, 'Betrayed by my order.', 14, 0, 100, 0, 0, 8920, 0, 0, 'Shade of Highlord Mograine - memory'),
+(9503000, 1, 1, 'Destroyed by Kel''Thuzad.', 14, 0, 100, 0, 0, 8921, 0, 0, 'Shade of Highlord Mograine - memory'),
+(9503000, 1, 2, 'Made to serve.', 14, 0, 100, 0, 0, 8922, 0, 0, 'Shade of Highlord Mograine - memory'),
+(9503000, 1, 3, 'My son watched me die.', 14, 0, 100, 0, 0, 8923, 0, 0, 'Shade of Highlord Mograine - memory'),
+(9503000, 2, 0, 'Kill them all!', 14, 0, 100, 0, 0, 8928, 0, 0, 'Shade of Highlord Mograine - frenzy at 30%'),
+(9503000, 3, 0, 'I was pure once...', 14, 0, 100, 0, 0, 8906, 0, 0, 'Shade of Highlord Mograine - death');
 
 -- ---------------------------------------------------------------------------------------------
 -- Quests
@@ -89,7 +100,7 @@ INSERT INTO `quest_template` (`ID`, `QuestType`, `QuestLevel`, `MinLevel`, `Ques
  'Then it is time.$B$BI will call the Light into the blade, and the Light does not share. Whatever Kel''Thuzad left in this steel will be driven out, and it will not go quietly. It knows only one shape, $N, and it will wear his.$B$BThis is no fight for one sword. Gather those you trust and have them stand close.$B$BWhen you tell me you are ready, I will begin. If it drives you back, come and speak to me, and we will try again.',
  '',
  'Return to Tirion Fordring in the Eastern Plaguelands.',
- 9501300, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0),
+ 9503000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0),
 (9501304, 2, 60, 60, 139, 83, 0, 0, 13262, 1,
  'The Ashbringer',
  'Give the Corrupted Ashbringer to Tirion Fordring.',

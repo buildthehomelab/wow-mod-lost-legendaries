@@ -42,14 +42,25 @@ DELETE FROM `quest_template_addon` WHERE `ID` BETWEEN 9501300 AND 9501304;
 DELETE FROM `quest_template` WHERE `ID` BETWEEN 9501300 AND 9501304;
 
 -- Shade of Highlord Mograine
-DELETE FROM `creature_text` WHERE `CreatureID` = 9501300;
-DELETE FROM `creature_equip_template` WHERE `CreatureID` = 9501300;
-DELETE FROM `creature_template_model` WHERE `CreatureID` = 9501300;
-DELETE FROM `creature_template` WHERE `entry` = 9501300;
+DELETE FROM `creature_text` WHERE `CreatureID` = 9503000;
+DELETE FROM `creature_equip_template` WHERE `CreatureID` = 9503000;
+DELETE FROM `creature_template_model` WHERE `CreatureID` = 9503000;
+DELETE FROM `creature_template` WHERE `entry` = 9503000;
+
+-- The shade's id before 2026-10-11, in case this database never got the move. Only while
+-- 9501300 is still the shade: the druid form look pack numbers its creatures from that block.
+DELETE x FROM `creature_text` x JOIN `creature_template` t ON t.`entry` = x.`CreatureID`
+WHERE t.`entry` = 9501300 AND t.`ScriptName` = 'boss_lost_legendaries_mograine_shade';
+DELETE x FROM `creature_equip_template` x JOIN `creature_template` t ON t.`entry` = x.`CreatureID`
+WHERE t.`entry` = 9501300 AND t.`ScriptName` = 'boss_lost_legendaries_mograine_shade';
+DELETE x FROM `creature_template_model` x JOIN `creature_template` t ON t.`entry` = x.`CreatureID`
+WHERE t.`entry` = 9501300 AND t.`ScriptName` = 'boss_lost_legendaries_mograine_shade';
+DELETE FROM `creature_template` WHERE `entry` = 9501300 AND `ScriptName` = 'boss_lost_legendaries_mograine_shade';
 
 -- Foror's Fabled Steed: flight auras and the mount spell's script
 DELETE FROM `spell_script_names` WHERE `spell_id` = 24576 AND `ScriptName` = 'spell_lost_legendaries_chromatic_mount';
-DELETE FROM `spell_dbc` WHERE `ID` IN (90230, 90231);
+DELETE FROM `spell_dbc` WHERE `ID` IN (90350, 90351);
+DELETE FROM `spell_dbc` WHERE `ID` IN (90230, 90231) AND `Name_Lang_enUS` LIKE 'Chromatic Mount%';
 
 -- Let a later reinstall apply the module's updates again
 DELETE FROM `updates` WHERE `name` LIKE 'mod\_lost\_legendaries\_%';
