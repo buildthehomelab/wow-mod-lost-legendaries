@@ -5,8 +5,8 @@
  * should fly once its rider can, so while the mount is up the rider also gets one of two
  * server-only auras, each a single "mounted flight speed" effect like the one every flying mount
  * spell carries:
- *   90230  +150% flight speed   riding skill 225 (Expert)
- *   90231  +280% flight speed   riding skill 300 (Artisan)
+ *   90350  +150% flight speed   riding skill 225 (Expert)
+ *   90351  +280% flight speed   riding skill 300 (Artisan)
  * The core does the rest from that effect: it switches flying on and off for the client and
  * sets the flight speed. The client doesn't know these two spells, so they show no buff; the
  * mount's own buff is the one players see and cancel.
@@ -41,8 +41,8 @@
 namespace
 {
     constexpr uint32 SPELL_CHROMATIC_MOUNT = 24576;
-    constexpr uint32 SPELL_STEED_FLIGHT = 90230;       // +150% mounted flight speed
-    constexpr uint32 SPELL_STEED_FLIGHT_FAST = 90231;  // +280% mounted flight speed
+    constexpr uint32 SPELL_STEED_FLIGHT = 90350;       // +150% mounted flight speed
+    constexpr uint32 SPELL_STEED_FLIGHT_FAST = 90351;  // +280% mounted flight speed
 
     constexpr uint16 RIDING_SKILL_EXPERT = 225;
     constexpr uint16 RIDING_SKILL_ARTISAN = 300;

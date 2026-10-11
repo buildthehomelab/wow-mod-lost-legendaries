@@ -50,7 +50,7 @@ namespace
 {
     constexpr uint32 NPC_HIGH_INQUISITOR_FAIRBANKS = 4542;
     constexpr uint32 NPC_TIRION_FORDRING = 1855;
-    constexpr uint32 NPC_SHADE_OF_MOGRAINE = 9501300;
+    constexpr uint32 NPC_SHADE_OF_MOGRAINE = 9503000;
 
     constexpr uint32 GOSSIP_MENU_FAIRBANKS_LAST = 7268;  // "But his son is dead."
     constexpr uint32 GOSSIP_ACTION_BEGIN_CLEANSING = 9501303;  // our line on Tirion's menu
