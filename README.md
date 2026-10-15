@@ -75,11 +75,12 @@ it flies, once you have the riding skill for it:
 | 300 (Artisan) | Outland, and Northrend with Cold Weather Flying | 280% flying |
 
 The same rules as any flying mount decide where: if a Swift Blue Gryphon would fly there, so does
-the steed. Ride out of a flying area and it becomes a ground mount again, and its slow fall
-softens the landing. On a realm that is still in vanilla nothing changes, since there is no
-flying skill to learn yet. `LostLegendaries.FororsFabledSteed.Flying = 0` keeps it on the ground
-everywhere. If you run a module that rescales mount speeds, such as mod-mount-scaling, it
-rescales the steed's flight the same way as other flying mounts'.
+the steed. Fly into Dalaran, or over Wintergrasp while a battle is on, and you get the same warning
+and parachute as on any flying mount. Ride out of a flying area and it becomes a ground mount
+again, and its slow fall softens the landing. On a realm that is still in vanilla nothing
+changes, since there is no flying skill to learn yet. `LostLegendaries.FororsFabledSteed.Flying = 0`
+keeps it on the ground everywhere. If you run a module that rescales mount speeds, such as
+mod-mount-scaling, it rescales the steed's flight the same way as other flying mounts'.
 
 Three things are changed to make it work:
 

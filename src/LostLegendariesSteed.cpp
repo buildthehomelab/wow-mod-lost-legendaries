@@ -13,10 +13,13 @@
  *
  * Where it flies is the core's rule, not ours. Both auras carry the same "only in flying areas"
  * attribute as stock flying mounts, so SpellInfo::CheckLocation allows them only where a Swift
- * Blue Gryphon would work (Outland, and Northrend with Cold Weather Flying), and the core removes
- * them by itself when the rider leaves such an area. The steed then carries on as a ground mount,
- * and its slow fall softens the landing. On a vanilla-only realm nothing changes: there is no
- * flying skill to have and nowhere to fly.
+ * Blue Gryphon could be summoned (Outland, and Northrend with Cold Weather Flying). Once on, the
+ * aura is kept the way the core keeps a stock flying mount's: only the lenient check, so riding
+ * into Dalaran or a Wintergrasp battle gets the core's warning and parachute (its area spells
+ * look for exactly this kind of aura) instead of a drop out of the sky. Where even that check
+ * fails, the core removes the aura itself; the steed then carries on as a ground mount, and its
+ * slow fall softens the landing. On a vanilla-only realm nothing changes: there is no flying
+ * skill to have and nowhere to fly.
  *
  * The auras are passive, so they are not saved at logout. After a login or an area change the
  * area-update hook puts the right one back if the rider is still mounted.
@@ -58,15 +61,24 @@ namespace
             || !player->IsAlive() || !player->HasAura(SPELL_CHROMATIC_MOUNT))
             return 0;
 
-        uint16 riding = player->GetSkillValue(SKILL_RIDING);
+        uint16 riding = player->GetPureSkillValue(SKILL_RIDING);
         if (riding < RIDING_SKILL_EXPERT)
             return 0;
 
         uint32 spellId = riding >= RIDING_SKILL_ARTISAN ? SPELL_STEED_FLIGHT_FAST : SPELL_STEED_FLIGHT;
 
-        // the same two checks the core makes when a flying mount is cast
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo || spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), areaId, player) != SPELL_CAST_OK)
+        if (!spellInfo)
+            return 0;
+
+        // Flying already: keep it as the core keeps a stock flying mount's aura (lenient check);
+        // the core's own area spells take the rider down where flying ends.
+        if (player->HasAura(SPELL_STEED_FLIGHT) || player->HasAura(SPELL_STEED_FLIGHT_FAST))
+            return spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), areaId, player, false) == SPELL_CAST_OK
+                ? spellId : 0;
+
+        // Taking off: the same two checks the core makes when a flying mount is cast.
+        if (spellInfo->CheckLocation(player->GetMapId(), player->GetZoneId(), areaId, player) != SPELL_CAST_OK)
             return 0;
 
         Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
@@ -80,12 +92,13 @@ namespace
     {
         uint32 wanted = WantedFlightSpell(player, areaId);
 
+        // The new aura first: between a removal and an add the core would switch flying off.
+        if (wanted && !player->HasAura(wanted))
+            player->AddAura(wanted, player);
+
         for (uint32 spellId : flightSpells)
             if (spellId != wanted)
                 player->RemoveAurasDueToSpell(spellId);
-
-        if (wanted && !player->HasAura(wanted))
-            player->AddAura(wanted, player);
     }
 }
 
@@ -116,7 +129,7 @@ class spell_lost_legendaries_chromatic_mount : public AuraScript
 class LostLegendariesSteedPlayerScript : public PlayerScript
 {
 public:
-    LostLegendariesSteedPlayerScript() : PlayerScript("LostLegendariesSteedPlayerScript", { PLAYERHOOK_ON_UPDATE_AREA }) { }
+    LostLegendariesSteedPlayerScript() : PlayerScript("LostLegendariesSteedPlayerScript", { PLAYERHOOK_ON_UPDATE_AREA, PLAYERHOOK_ON_LEARN_SPELL }) { }
 
     // Runs before the core drops area-bound auras for the new area. Covers riding into a place
     // where flying is allowed, and the first area update after logging in mounted.
@@ -124,6 +137,13 @@ public:
     {
         if (player->HasAura(SPELL_CHROMATIC_MOUNT))
             UpdateSteedFlight(player, newArea);
+    }
+
+    // A riding skill or Cold Weather Flying learned in the saddle counts at once.
+    void OnPlayerLearnSpell(Player* player, uint32 /*spellId*/) override
+    {
+        if (player->HasAura(SPELL_CHROMATIC_MOUNT))
+            UpdateSteedFlight(player, player->GetAreaId());
     }
 };
 
